@@ -118,4 +118,4 @@ For each metric, create an item with:
 
 This is a personal learning project built to explore Android development and Zabbix integration. It is not intended for production use.
 
-Feel free to fork, modify, and improve it!
+
