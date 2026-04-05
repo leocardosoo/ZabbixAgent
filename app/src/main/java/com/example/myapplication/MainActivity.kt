@@ -1,86 +1,196 @@
 package com.example.myapplication
 
-import android.content.Context
 import android.content.Intent
+import android.graphics.*
+import android.graphics.drawable.GradientDrawable
 import android.os.*
+import android.text.InputType
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val prefs = getSharedPreferences("zabbix_config", Context.MODE_PRIVATE)
+        val scroll = ScrollView(this).apply {
+            setBackgroundColor(Color.parseColor("#0D0F14"))
+        }
 
-        val layout = LinearLayout(this).apply {
+        val root = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(48, 48, 48, 48)
+            setPadding(48, 96, 48, 80)
+        }
+
+        // ==================== HEADER ====================
+        val accentBar = android.view.View(this).apply {
+            setBackgroundColor(Color.parseColor("#00E5FF"))
+            layoutParams = LinearLayout.LayoutParams(80, 6).apply { bottomMargin = 32 }
         }
 
         val title = TextView(this).apply {
-            text = "Zabbix Agent"
-            textSize = 24f
-            setPadding(0, 0, 0, 32)
+            text = "ZABBIX"
+            textSize = 36f
+            setTypeface(Typeface.MONOSPACE, Typeface.BOLD)
+            setTextColor(Color.WHITE)
+            letterSpacing = 0.2f
         }
 
-        val inputUrl = EditText(this).apply {
-            hint = "http://yourserver/zabbix/api_jsonrpc.php"
-            setText(prefs.getString("api_url", ""))
+        val subtitle = TextView(this).apply {
+            text = "Android Agent  //  v1.0"
+            textSize = 12f
+            setTypeface(Typeface.MONOSPACE, Typeface.NORMAL)
+            setTextColor(Color.parseColor("#00E5FF"))
+            setPadding(0, 8, 0, 64)
+            letterSpacing = 0.1f
         }
 
-        val inputToken = EditText(this).apply {
-            hint = "token"
-            setText(prefs.getString("api_token", ""))
-        }
-
-        val inputHost = EditText(this).apply {
-            hint = "Device name"
-            setText(prefs.getString("host_name", "Android Phone"))
-        }
-
-        val inputInterval = EditText(this).apply {
-            hint = "5"
-            inputType = android.text.InputType.TYPE_CLASS_NUMBER
-            setText("${prefs.getLong("interval_ms", 5000L) / 1000}")
-        }
-
-        val btnStart = Button(this).apply { text = "▶ start" }
-        val btnStop = Button(this).apply { text = "■ stop" }
-
-        val status = TextView(this).apply {
-            text = "Status: stopped"
-        }
-
-        btnStart.setOnClickListener {
-            val url = inputUrl.text.toString().trim()
-            val token = inputToken.text.toString().trim()
-            val host = inputHost.text.toString().ifEmpty { "Android Phone" }
-            val interval = (inputInterval.text.toString().toLongOrNull() ?: 5L) * 1000L
-
-            if (url.isEmpty() || token.isEmpty()) {
-                Toast.makeText(this, "Preencha a URL e o Token!", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
+        // ==================== HELPERS ====================
+        fun makeSection(label: String): TextView {
+            return TextView(this).apply {
+                text = "── $label"
+                textSize = 10f
+                setTypeface(Typeface.MONOSPACE, Typeface.BOLD)
+                setTextColor(Color.parseColor("#00E5FF"))
+                letterSpacing = 0.2f
+                setPadding(0, 0, 0, 20)
             }
-
-            prefs.edit()
-                .putString("api_url", url)
-                .putString("api_token", token)
-                .putString("host_name", host)
-                .putLong("interval_ms", interval)
-                .apply()
-
-            // Inicia direto (sem delay)
-            ContextCompat.startForegroundService(
-                this,
-                Intent(this, ZabbixService::class.java)
-            )
-
-            status.text = "Status: rodando ✅"
         }
 
-        // ✅ STOP CORRETO
+        fun makeFieldLabel(text: String): TextView {
+            return TextView(this).apply {
+                this.text = text
+                textSize = 10f
+                setTypeface(Typeface.MONOSPACE, Typeface.NORMAL)
+                setTextColor(Color.parseColor("#666E82"))
+                letterSpacing = 0.15f
+                setPadding(0, 0, 0, 6)
+            }
+        }
+
+        fun makeInput(hint: String, value: String, numeric: Boolean = false): EditText {
+            return EditText(this).apply {
+                this.hint = hint
+                setText(value)
+                textSize = 14f
+                setTypeface(Typeface.MONOSPACE)
+                setTextColor(Color.parseColor("#E8ECF4"))
+                setHintTextColor(Color.parseColor("#3A3F4E"))
+                if (numeric) inputType = InputType.TYPE_CLASS_NUMBER
+                setPadding(32, 28, 32, 28)
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply { bottomMargin = 24 }
+                background = GradientDrawable().apply {
+                    setColor(Color.parseColor("#161A24"))
+                    setStroke(1, Color.parseColor("#2A2F3E"))
+                    cornerRadius = 4f
+                }
+            }
+        }
+
+        fun makeCard(block: LinearLayout.() -> Unit): LinearLayout {
+            return LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(40, 36, 40, 36)
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply { bottomMargin = 32 }
+                background = GradientDrawable().apply {
+                    setColor(Color.parseColor("#13161F"))
+                    setStroke(1, Color.parseColor("#1E2230"))
+                    cornerRadius = 8f
+                }
+                block()
+            }
+        }
+
+        // ==================== INPUTS ====================
+        val inputUrl = makeInput(
+            "http://yourserver/zabbix/api_jsonrpc.php",
+            ZabbixConfig.getUrl(this)
+        )
+        val inputToken = makeInput("••••••••••••••••••••••••••••••••", ZabbixConfig.getToken(this))
+        val inputHost = makeInput("Android Phone", ZabbixConfig.getHostName(this))
+        val inputInterval = makeInput("5", "${ZabbixConfig.getInterval(this) / 1000}", numeric = true)
+
+        // ==================== CARDS ====================
+        val cardServer = makeCard {
+            addView(makeSection("SERVER CONFIG"))
+            addView(makeFieldLabel("API ENDPOINT"))
+            addView(inputUrl)
+            addView(makeFieldLabel("AUTH TOKEN"))
+            addView(inputToken)
+        }
+
+        val cardDevice = makeCard {
+            addView(makeSection("DEVICE CONFIG"))
+            addView(makeFieldLabel("HOST NAME"))
+            addView(inputHost)
+            addView(makeFieldLabel("SEND INTERVAL (seconds)"))
+            addView(inputInterval)
+        }
+
+        // ==================== STATUS ====================
+        val statusContainer = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = android.view.Gravity.CENTER_VERTICAL
+            setPadding(0, 0, 0, 40)
+        }
+
+        val statusDot = TextView(this).apply {
+            text = "●"
+            textSize = 10f
+            setTextColor(Color.parseColor("#444A5A"))
+            setPadding(0, 0, 16, 0)
+        }
+
+        val statusText = TextView(this).apply {
+            text = "AGENT OFFLINE"
+            textSize = 11f
+            setTypeface(Typeface.MONOSPACE, Typeface.BOLD)
+            setTextColor(Color.parseColor("#444A5A"))
+            letterSpacing = 0.15f
+        }
+
+        statusContainer.addView(statusDot)
+        statusContainer.addView(statusText)
+
+        // ==================== BUTTONS ====================
+        val btnStart = Button(this).apply {
+            text = "[ START AGENT ]"
+            textSize = 13f
+            setTypeface(Typeface.MONOSPACE, Typeface.BOLD)
+            setTextColor(Color.parseColor("#0D0F14"))
+            letterSpacing = 0.1f
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, 148
+            ).apply { bottomMargin = 20 }
+            background = GradientDrawable().apply {
+                setColor(Color.parseColor("#00E5FF"))
+                cornerRadius = 4f
+            }
+        }
+
+        val btnStop = Button(this).apply {
+            text = "[ STOP AGENT ]"
+            textSize = 13f
+            setTypeface(Typeface.MONOSPACE, Typeface.BOLD)
+            setTextColor(Color.parseColor("#FF4757"))
+            letterSpacing = 0.1f
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, 148
+            )
+            background = GradientDrawable().apply {
+                setColor(Color.parseColor("#13161F"))
+                setStroke(1, Color.parseColor("#FF4757"))
+                cornerRadius = 4f
+            }
+        }
+
+        // ==================== ACTIONS ====================
         btnStart.setOnClickListener {
             val url = inputUrl.text.toString().trim()
             val token = inputToken.text.toString().trim()
@@ -88,16 +198,11 @@ class MainActivity : AppCompatActivity() {
             val interval = (inputInterval.text.toString().toLongOrNull() ?: 5L) * 1000L
 
             if (url.isEmpty() || token.isEmpty()) {
-                Toast.makeText(this, "Preencha a URL e o Token!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Fill in the URL and Token!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            prefs.edit()
-                .putString("api_url", url)
-                .putString("api_token", token)
-                .putString("host_name", host)
-                .putLong("interval_ms", interval)
-                .apply()
+            ZabbixConfig.save(this, url, token, host, interval)
 
             val serviceIntent = Intent(this, ZabbixService::class.java)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -106,19 +211,31 @@ class MainActivity : AppCompatActivity() {
                 startService(serviceIntent)
             }
 
-            status.text = "Status: rodando ✅"
-            Toast.makeText(this, "Agente iniciado!", Toast.LENGTH_SHORT).show()
+            statusDot.setTextColor(Color.parseColor("#00E5FF"))
+            statusText.setTextColor(Color.parseColor("#00E5FF"))
+            statusText.text = "AGENT ONLINE"
+            Toast.makeText(this, "Agent started!", Toast.LENGTH_SHORT).show()
         }
 
-        layout.addView(title)
-        layout.addView(inputUrl)
-        layout.addView(inputToken)
-        layout.addView(inputHost)
-        layout.addView(inputInterval)
-        layout.addView(btnStart)
-        layout.addView(btnStop)
-        layout.addView(status)
+        btnStop.setOnClickListener {
+            stopService(Intent(this, ZabbixService::class.java))
+            statusDot.setTextColor(Color.parseColor("#444A5A"))
+            statusText.setTextColor(Color.parseColor("#444A5A"))
+            statusText.text = "AGENT OFFLINE"
+            Toast.makeText(this, "Agent stopped!", Toast.LENGTH_SHORT).show()
+        }
 
-        setContentView(ScrollView(this).apply { addView(layout) })
+        // ==================== ASSEMBLE ====================
+        root.addView(accentBar)
+        root.addView(title)
+        root.addView(subtitle)
+        root.addView(cardServer)
+        root.addView(cardDevice)
+        root.addView(statusContainer)
+        root.addView(btnStart)
+        root.addView(btnStop)
+
+        scroll.addView(root)
+        setContentView(scroll)
     }
 }
