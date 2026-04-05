@@ -14,7 +14,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         val scroll = ScrollView(this).apply {
-            setBackgroundColor(Color.parseColor("#0D0F14"))
+            setBackgroundColor(Color.parseColor("#1F2226"))
         }
 
         val root = LinearLayout(this).apply {
@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity() {
 
         // ==================== HEADER ====================
         val accentBar = android.view.View(this).apply {
-            setBackgroundColor(Color.parseColor("#00E5FF"))
+            setBackgroundColor(Color.parseColor("#D9400B"))
             layoutParams = LinearLayout.LayoutParams(80, 6).apply { bottomMargin = 32 }
         }
 
@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity() {
             text = "Android Agent  //  v1.0"
             textSize = 12f
             setTypeface(Typeface.MONOSPACE, Typeface.NORMAL)
-            setTextColor(Color.parseColor("#00E5FF"))
+            setTextColor(Color.parseColor("#D9400B"))
             setPadding(0, 8, 0, 64)
             letterSpacing = 0.1f
         }
@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity() {
                 text = "── $label"
                 textSize = 10f
                 setTypeface(Typeface.MONOSPACE, Typeface.BOLD)
-                setTextColor(Color.parseColor("#00E5FF"))
+                setTextColor(Color.parseColor("#D9400B"))
                 letterSpacing = 0.2f
                 setPadding(0, 0, 0, 20)
             }
@@ -62,7 +62,7 @@ class MainActivity : AppCompatActivity() {
                 this.text = text
                 textSize = 10f
                 setTypeface(Typeface.MONOSPACE, Typeface.NORMAL)
-                setTextColor(Color.parseColor("#666E82"))
+                setTextColor(Color.parseColor("#7A7F8E"))
                 letterSpacing = 0.15f
                 setPadding(0, 0, 0, 6)
             }
@@ -83,8 +83,8 @@ class MainActivity : AppCompatActivity() {
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 ).apply { bottomMargin = 24 }
                 background = GradientDrawable().apply {
-                    setColor(Color.parseColor("#161A24"))
-                    setStroke(1, Color.parseColor("#2A2F3E"))
+                    setColor(Color.parseColor("#16191D"))
+                    setStroke(1, Color.parseColor("#2E3238"))
                     cornerRadius = 4f
                 }
             }
@@ -99,8 +99,8 @@ class MainActivity : AppCompatActivity() {
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 ).apply { bottomMargin = 32 }
                 background = GradientDrawable().apply {
-                    setColor(Color.parseColor("#13161F"))
-                    setStroke(1, Color.parseColor("#1E2230"))
+                    setColor(Color.parseColor("#292D32"))
+                    setStroke(1, Color.parseColor("#33383F"))
                     cornerRadius = 8f
                 }
                 block()
@@ -109,12 +109,22 @@ class MainActivity : AppCompatActivity() {
 
         // ==================== INPUTS ====================
         val inputUrl = makeInput(
-            "http://yourserver/zabbix/api_jsonrpc.php",
+            "http://serverIP/zabbix/api_jsonrpc.php",
             ZabbixConfig.getUrl(this)
         )
-        val inputToken = makeInput("••••••••••••••••••••••••••••••••", ZabbixConfig.getToken(this))
-        val inputHost = makeInput("Android Phone", ZabbixConfig.getHostName(this))
-        val inputInterval = makeInput("5", "${ZabbixConfig.getInterval(this) / 1000}", numeric = true)
+        val inputToken = makeInput(
+            "Paste your API token here",
+            ZabbixConfig.getToken(this)
+        )
+        val inputHost = makeInput(
+            "Android Phone",
+            ZabbixConfig.getHostName(this)
+        )
+        val inputInterval = makeInput(
+            "5",
+            "${ZabbixConfig.getInterval(this) / 1000}",
+            numeric = true
+        )
 
         // ==================== CARDS ====================
         val cardServer = makeCard {
@@ -143,7 +153,7 @@ class MainActivity : AppCompatActivity() {
         val statusDot = TextView(this).apply {
             text = "●"
             textSize = 10f
-            setTextColor(Color.parseColor("#444A5A"))
+            setTextColor(Color.parseColor("#4A4F5A"))
             setPadding(0, 0, 16, 0)
         }
 
@@ -151,7 +161,7 @@ class MainActivity : AppCompatActivity() {
             text = "AGENT OFFLINE"
             textSize = 11f
             setTypeface(Typeface.MONOSPACE, Typeface.BOLD)
-            setTextColor(Color.parseColor("#444A5A"))
+            setTextColor(Color.parseColor("#4A4F5A"))
             letterSpacing = 0.15f
         }
 
@@ -163,13 +173,13 @@ class MainActivity : AppCompatActivity() {
             text = "[ START AGENT ]"
             textSize = 13f
             setTypeface(Typeface.MONOSPACE, Typeface.BOLD)
-            setTextColor(Color.parseColor("#0D0F14"))
+            setTextColor(Color.WHITE)
             letterSpacing = 0.1f
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, 148
             ).apply { bottomMargin = 20 }
             background = GradientDrawable().apply {
-                setColor(Color.parseColor("#00E5FF"))
+                setColor(Color.parseColor("#D9400B"))
                 cornerRadius = 4f
             }
         }
@@ -178,14 +188,14 @@ class MainActivity : AppCompatActivity() {
             text = "[ STOP AGENT ]"
             textSize = 13f
             setTypeface(Typeface.MONOSPACE, Typeface.BOLD)
-            setTextColor(Color.parseColor("#FF4757"))
+            setTextColor(Color.parseColor("#D9400B"))
             letterSpacing = 0.1f
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, 148
             )
             background = GradientDrawable().apply {
-                setColor(Color.parseColor("#13161F"))
-                setStroke(1, Color.parseColor("#FF4757"))
+                setColor(Color.parseColor("#1F2226"))
+                setStroke(1, Color.parseColor("#D9400B"))
                 cornerRadius = 4f
             }
         }
@@ -211,16 +221,16 @@ class MainActivity : AppCompatActivity() {
                 startService(serviceIntent)
             }
 
-            statusDot.setTextColor(Color.parseColor("#00E5FF"))
-            statusText.setTextColor(Color.parseColor("#00E5FF"))
+            statusDot.setTextColor(Color.parseColor("#D9400B"))
+            statusText.setTextColor(Color.parseColor("#D9400B"))
             statusText.text = "AGENT ONLINE"
             Toast.makeText(this, "Agent started!", Toast.LENGTH_SHORT).show()
         }
 
         btnStop.setOnClickListener {
             stopService(Intent(this, ZabbixService::class.java))
-            statusDot.setTextColor(Color.parseColor("#444A5A"))
-            statusText.setTextColor(Color.parseColor("#444A5A"))
+            statusDot.setTextColor(Color.parseColor("#4A4F5A"))
+            statusText.setTextColor(Color.parseColor("#4A4F5A"))
             statusText.text = "AGENT OFFLINE"
             Toast.makeText(this, "Agent stopped!", Toast.LENGTH_SHORT).show()
         }
