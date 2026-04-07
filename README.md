@@ -8,7 +8,6 @@ A lightweight Android app written in Kotlin that turns your phone into a Zabbix 
 
 - Runs in the background as a Foreground Service
 - Persistent notification with a quick Stop button
-- Simple configuration screen (no hardcoded values)
 - Sends data via Zabbix API using Bearer token authentication
 - Survives app close — keeps sending metrics in background
 
@@ -108,7 +107,6 @@ For each metric, create an item with:
 
 - **Storage:** reads only the app data partition, not the full device storage
 - **CPU:** measures only the app process usage, not total system CPU
-- **WiFi SSID:** shows `<unknown ssid>` if location permission is denied
 - **Battery voltage:** reported in Volts (converted from mV)
 - Phone and server must be on the same network (or reachable via IP)
 
